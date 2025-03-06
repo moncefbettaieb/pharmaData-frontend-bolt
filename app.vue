@@ -8,10 +8,9 @@
 </template>
 
 <script setup>
-import Toast from 'vue-toastification'
+import { useToast } from 'vue-toastification'
 import "vue-toastification/dist/index.css"
 
-const { useToast } = Toast
 const toast = useToast()
 
 // Make toast available globally

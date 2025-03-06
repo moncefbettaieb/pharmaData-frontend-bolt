@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia'
 
 interface Product {
-  id: string
-  name: string
-  description: string
+  cip_code: string
+  title: string
+  brand: string
   image_url: string
   price: number
 }
@@ -21,7 +21,7 @@ export const useProductsStore = defineStore('products', {
       this.error = null
       try {
         const config = useRuntimeConfig()
-        const response = await fetch(`${config.public.apiBaseUrl}/products`, {
+        const response = await fetch(`${config.public.apiBaseUrl}/api/v1/products`, {
           headers: {
             'Authorization': `Bearer ${config.public.apiToken}`
           }

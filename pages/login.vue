@@ -157,8 +157,7 @@
 
 <script setup>
 import { useAuthStore } from '~/stores/auth'
-import Toast from 'vue-toastification'
-const { useToast } = Toast
+import { useToast } from 'vue-toastification'
 
 const authStore = useAuthStore()
 const router = useRouter()

@@ -104,7 +104,7 @@ Authorization: Bearer votre_token</pre>
               <h4 class="text-sm font-medium text-gray-900">Exemple de requête</h4>
               <pre class="mt-2 rounded-md bg-gray-50 p-4">
 curl -X GET \
-  {{ config.public.apiBaseUrl }}/products \
+  {{ config.public.apiBaseUrl }}/api/v1/products \
   -H 'Authorization: Bearer votre_token'</pre>
             </div>
           </div>
@@ -158,8 +158,7 @@ curl -X GET \
 
 <script setup lang="ts">
 import { useApiStore } from '~/stores/api'
-import Toast from 'vue-toastification'
-const { useToast } = Toast
+import { useToast } from 'vue-toastification'
 
 const apiStore = useApiStore()
 const config = useRuntimeConfig()

@@ -69,12 +69,11 @@
 <script setup>
 import { useAuthStore } from '~/stores/auth'
 import { usePlansStore } from '~/stores/plans'
-import Toast from 'vue-toastification'
+import { useToast } from 'vue-toastification'
 import { loadStripe } from '@stripe/stripe-js'
 import { httpsCallable } from 'firebase/functions'
 import { storeToRefs } from 'pinia'
 
-const { useToast } = Toast
 const authStore = useAuthStore()
 const plansStore = usePlansStore()
 const { user } = storeToRefs(authStore)
@@ -95,9 +94,15 @@ const selectPlan = async (plan) => {
       throw new Error('Firebase Functions non initialisé')
     }
 
+    // Vérifier que la clé Stripe est disponible
+    console.log('Clé publique Stripe:', config.public.stripePublicKey)
+    console.log('Clé secrete Stripe:', config.public.stripeSecretKey)
     if (!config.public.stripePublicKey) {
-      throw new Error('La clé publique Stripe n\'est pas configurée. Veuillez contacter l\'administrateur.')
+      console.error('Clé publique Stripe manquante dans la configuration')
+      throw new Error('Configuration Stripe manquante')
     }
+    
+    console.log('Clé publique Stripe:', config.public.stripePublicKey)
 
     // Initialiser Stripe
     const stripe = await loadStripe(config.public.stripePublicKey)
@@ -108,25 +113,35 @@ const selectPlan = async (plan) => {
     // Appeler la Cloud Function
     const createSubscriptionCall = httpsCallable($functions, 'createSubscription')
     
+    console.log('Appel de la fonction avec les paramètres:', {
+      priceId: plan.id,
+      successUrl: `${window.location.origin}/payment/success`,
+      cancelUrl: `${window.location.origin}/payment/cancel`
+    })
+    
     const result = await createSubscriptionCall({
       priceId: plan.id,
       successUrl: `${window.location.origin}/payment/success`,
       cancelUrl: `${window.location.origin}/payment/cancel`
     })
 
+    console.log('Résultat de la fonction:', result)
+    
     const { sessionId } = result.data
     if (!sessionId) {
+      console.error('Réponse de la fonction:', result.data)
       throw new Error('Session ID manquant dans la réponse')
     }
 
     // Rediriger vers Stripe Checkout
     const { error } = await stripe.redirectToCheckout({ sessionId })
     if (error) {
+      console.error('Erreur Stripe:', error)
       throw error
     }
   } catch (error) {
-    console.error('Erreur lors du paiement:', error)
-    toast.error(error.message || "Une erreur s'est produite lors de la redirection vers le paiement")
+    console.error('Erreur complète:', error)
+    toast.error("Une erreur s'est produite lors de la redirection vers le paiement")
   } finally {
     loading.value = false
   }

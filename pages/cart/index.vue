@@ -92,12 +92,10 @@
 <script setup lang="ts">
 import { useCartStore } from '~/stores/cart'
 import { usePaymentStore } from '~/stores/payment'
-import Toast from 'vue-toastification'
-const { useToast } = Toast
+import { useToast } from 'vue-toastification'
 
 const cartStore = useCartStore()
 const paymentStore = usePaymentStore()
-const toast = useToast()
 
 const updateQuantity = (productId: string, quantity: number): void => {
   cartStore.updateQuantity(productId, quantity)
@@ -105,7 +103,7 @@ const updateQuantity = (productId: string, quantity: number): void => {
 
 const removeFromCart = (productId: string): void => {
   cartStore.removeFromCart(productId)
-  toast.success('Produit retiré du panier')
+  useToast.success('Produit retiré du panier')
 }
 
 const proceedToCheckout = async (): Promise<void> => {
@@ -117,7 +115,7 @@ const proceedToCheckout = async (): Promise<void> => {
     
     await paymentStore.createCheckoutSession(items)
   } catch (error) {
-    toast.error("Une erreur s'est produite lors de la redirection vers le paiement")
+    useToast.error("Une erreur s'est produite lors de la redirection vers le paiement")
   }
 }
 
